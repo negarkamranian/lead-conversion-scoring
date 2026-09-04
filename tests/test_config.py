@@ -25,7 +25,9 @@ def test_settings_read_environment(monkeypatch):
     monkeypatch.setenv("DB_PORT", "5544")
     monkeypatch.setenv("TOP_FRACTION", "0.25")
     monkeypatch.setenv("RANDOM_SEED", "7")
+    monkeypatch.setenv("LOG_LEVEL", "DEBUG")
     settings = Settings(_env_file=None)
     assert settings.db_port == 5544
     assert settings.top_fraction == 0.25
     assert settings.random_seed == 7
+    assert settings.log_level == "DEBUG"

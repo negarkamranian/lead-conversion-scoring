@@ -13,7 +13,7 @@ ENV PYTHONUNBUFFERED=1 \
 RUN groupadd --gid 10001 app \
     && useradd --uid 10001 --gid app --home-dir /home/app --create-home \
         --shell /usr/sbin/nologin app \
-    && mkdir -p /app/artifacts /app/charts /home/app/.cache/uv \
+    && mkdir -p /app/artifacts /app/charts /app/mlruns /home/app/.cache/uv \
     && chown -R app:app /app /home/app
 WORKDIR /app
 COPY --chown=app:app pyproject.toml uv.lock README.md ./

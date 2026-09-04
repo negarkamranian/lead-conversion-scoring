@@ -1,4 +1,4 @@
-.PHONY: db init ingest quality train evaluate score monitor pipeline test test-unit lint typecheck format format-fix check build
+.PHONY: db init ingest quality train evaluate score monitor pipeline mlflow-ui test test-unit lint typecheck format format-fix check build
 
 APP_RUN = docker compose run --rm app uv run --frozen
 
@@ -31,6 +31,9 @@ monitor: build
 
 pipeline: build
 	$(APP_RUN) lead-scoring pipeline
+
+mlflow-ui: build
+	docker compose run --rm --no-deps -p 5000:5000 app uv run --frozen mlflow server --backend-store-uri sqlite:////app/mlruns/mlflow.db --default-artifact-root /app/mlruns/artifacts --host 0.0.0.0 --port 5000
 
 test: build
 	$(APP_RUN) pytest -q
