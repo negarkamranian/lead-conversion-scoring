@@ -1,0 +1,27 @@
+{
+  "lead_id_overlap": 0,
+  "strategy": "chronological_70_15_15",
+  "test": {
+    "created_max": "2026-08-28T23:58:00+00:00",
+    "created_min": "2026-08-06T10:03:00+00:00",
+    "positives": 558,
+    "prevalence": 0.07439008132249034,
+    "rows": 7501
+  },
+  "train": {
+    "created_max": "2026-07-15T09:06:00+00:00",
+    "created_min": "2026-04-01T00:19:00+00:00",
+    "positives": 3352,
+    "prevalence": 0.09577416497614218,
+    "rows": 34999
+  },
+  "train_cutoff": "2026-07-15T09:07:00+00:00",
+  "validation": {
+    "created_max": "2026-08-06T10:02:00+00:00",
+    "created_min": "2026-07-15T09:07:00+00:00",
+    "positives": 674,
+    "prevalence": 0.08986666666666666,
+    "rows": 7500
+  },
+  "validation_cutoff": "2026-08-06T10:03:00+00:00"
+}

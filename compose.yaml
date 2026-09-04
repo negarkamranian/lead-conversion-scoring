@@ -1,0 +1,41 @@
+services:
+  db:
+    image: postgres:16.6-alpine
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-lead_scoring}
+      POSTGRES_USER: ${POSTGRES_USER:-lead_app}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-local_dev_only}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+    ports:
+      - "${DB_PORT_FORWARD:-5432}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  app:
+    build:
+      context: .
+    env_file:
+      - path: .env
+        required: false
+    environment:
+      DB_HOST: db
+      DB_PORT: 5432
+      DATA_PATH: /app/data/leads.csv
+      DICTIONARY_PATH: /app/data/data_dictionary.csv
+      ARTIFACT_DIR: /app/artifacts
+      CHART_DIR: /app/charts
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - artifacts_data:/app/artifacts
+      - charts_data:/app/charts
+
+volumes:
+  postgres_data:
+  artifacts_data:
+  charts_data:

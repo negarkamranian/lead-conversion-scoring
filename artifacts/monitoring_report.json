@@ -1,0 +1,159 @@
+{
+  "categorical_features": {
+    "Channel": {
+      "missing_rate": 0.0,
+      "missing_rate_delta": 0.0,
+      "psi": 3.820399582556398e-05,
+      "unseen_category_rate": 0.0
+    },
+    "City": {
+      "missing_rate": 0.01864,
+      "missing_rate_delta": -0.0002748261378896534,
+      "psi": 0.00016718333895496322,
+      "unseen_category_rate": 0.0
+    },
+    "Device": {
+      "missing_rate": 0.0,
+      "missing_rate_delta": 0.0,
+      "psi": 6.089120769019362e-06,
+      "unseen_category_rate": 0.0
+    },
+    "Insurance Company": {
+      "missing_rate": 0.0,
+      "missing_rate_delta": 0.0,
+      "psi": 1.732648562318213e-05,
+      "unseen_category_rate": 0.0
+    },
+    "Partner": {
+      "missing_rate": 0.0,
+      "missing_rate_delta": 0.0,
+      "psi": 4.7453363480202637e-05,
+      "unseen_category_rate": 0.0
+    },
+    "Payment Type": {
+      "missing_rate": 0.0,
+      "missing_rate_delta": 0.0,
+      "psi": 1.0189918543298818e-05,
+      "unseen_category_rate": 0.0
+    },
+    "Product Type": {
+      "missing_rate": 0.0,
+      "missing_rate_delta": 0.0,
+      "psi": 5.600572166125074e-06,
+      "unseen_category_rate": 0.0
+    }
+  },
+  "delayed_performance": {
+    "available": true,
+    "average_precision": 0.20449626151835507,
+    "brier_score": 0.07866799120185698,
+    "note": "Demonstration only: static historical labels are immediately available.",
+    "rows_labeled": 50000
+  },
+  "duplicates_removed": 180,
+  "numeric_features": {
+    "Created Day Of Week": {
+      "missing_rate": 0.0,
+      "missing_rate_delta": 0.0,
+      "outside_training_range_rate": 0.0,
+      "psi": 0.0005550295868802726
+    },
+    "Created Hour": {
+      "missing_rate": 0.0,
+      "missing_rate_delta": 0.0,
+      "outside_training_range_rate": 0.0,
+      "psi": 0.00013665190091715046
+    },
+    "Days Since Last Visit": {
+      "missing_rate": 0.0,
+      "missing_rate_delta": 0.0,
+      "outside_training_range_rate": 0.0,
+      "psi": 3.7894029335962845e-05
+    },
+    "Days To Policy Expiry": {
+      "missing_rate": 0.0,
+      "missing_rate_delta": 0.0,
+      "outside_training_range_rate": 0.0,
+      "psi": 0.0001158800302329408
+    },
+    "Discount Percent": {
+      "missing_rate": 0.01082,
+      "missing_rate_delta": -8.880825166432751e-06,
+      "outside_training_range_rate": 0.0,
+      "psi": 0.00017813595481523548
+    },
+    "Expected Margin": {
+      "missing_rate": 0.0,
+      "missing_rate_delta": 0.0,
+      "outside_training_range_rate": 0.0,
+      "psi": 4.1927780553608145e-05
+    },
+    "Has Previous Purchase": {
+      "missing_rate": 0.0,
+      "missing_rate_delta": 0.0,
+      "outside_training_range_rate": 0.0,
+      "psi": 0.0
+    },
+    "Incoming Call Last 24h": {
+      "missing_rate": 0.0,
+      "missing_rate_delta": 0.0,
+      "outside_training_range_rate": 0.0,
+      "psi": 0.0
+    },
+    "Minutes Since Abandonment": {
+      "missing_rate": 0.0,
+      "missing_rate_delta": 0.0,
+      "outside_training_range_rate": 0.0,
+      "psi": 0.00011886560366621431
+    },
+    "Offer Views Last 7d": {
+      "missing_rate": 0.0,
+      "missing_rate_delta": 0.0,
+      "outside_training_range_rate": 0.0,
+      "psi": 5.2927233778920054e-05
+    },
+    "Price": {
+      "missing_rate": 0.01856,
+      "missing_rate_delta": -1.1959198834253504e-05,
+      "outside_training_range_rate": 4.0756439517443756e-05,
+      "psi": 4.217490351551251e-05
+    },
+    "Price Comparisons Last 7d": {
+      "missing_rate": 0.0,
+      "missing_rate_delta": 0.0,
+      "outside_training_range_rate": 2e-05,
+      "psi": 2.5335263154849285e-05
+    },
+    "Sessions Last 7d": {
+      "missing_rate": 0.0,
+      "missing_rate_delta": 0.0,
+      "outside_training_range_rate": 0.0,
+      "psi": 1.7010212797412305e-05
+    },
+    "Visited Offer Page": {
+      "missing_rate": 0.0,
+      "missing_rate_delta": 0.0,
+      "outside_training_range_rate": 0.0,
+      "psi": 0.0
+    }
+  },
+  "predictions": {
+    "available": true,
+    "failure_count": 0,
+    "mean": 0.09573182276740289,
+    "psi": 5.583519573760487e-05,
+    "rows": 50000,
+    "std": 0.07175420845897747
+  },
+  "rows_input": 50000,
+  "schema_validation": "passed",
+  "status": "ok",
+  "threshold_note": "Initial assumptions; tune after observing production alert volume.",
+  "thresholds": {
+    "missing_rate_delta_warning": 0.05,
+    "outside_training_range_rate_warning": 0.01,
+    "psi_warning": 0.2,
+    "unseen_category_rate_warning": 0.01
+  },
+  "warnings": []
+}

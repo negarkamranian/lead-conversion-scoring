@@ -1,0 +1,691 @@
+{
+  "candidate_validation_metrics": {
+    "dummy_prior": {
+      "average_precision": 0.08986666666666666,
+      "brier_score": 0.08182554742516535,
+      "log_loss": 0.30243454318890506,
+      "roc_auc": 0.5
+    },
+    "hist_gradient_boosting": {
+      "average_precision": 0.1819770424776541,
+      "brier_score": 0.07824044150623596,
+      "log_loss": 0.280816134536418,
+      "roc_auc": 0.7054863538869101
+    },
+    "logistic_regression": {
+      "average_precision": 0.19344420009371727,
+      "brier_score": 0.07769539924134326,
+      "log_loss": 0.2780516757083156,
+      "roc_auc": 0.715852548424987
+    }
+  },
+  "config_hash": "78be2c98bc13b8a7195ed6a5608116417a47538cae5d98af33c9bcef6b3e8224",
+  "dependency_versions": {
+    "joblib": "1.4.2",
+    "lead-scoring": "0.1.0",
+    "numpy": "2.2.2",
+    "pandas": "2.2.3",
+    "psycopg": "3.2.4",
+    "pydantic": "2.13.5",
+    "pydantic-settings": "2.15.0",
+    "scikit-learn": "1.6.1",
+    "scipy": "1.15.1"
+  },
+  "duplicates_removed_downstream": 180,
+  "feature_schema": {
+    "categorical": [
+      "Product Type",
+      "Channel",
+      "Device",
+      "Partner",
+      "City",
+      "Insurance Company",
+      "Payment Type"
+    ],
+    "numeric": [
+      "Minutes Since Abandonment",
+      "Days To Policy Expiry",
+      "Price",
+      "Discount Percent",
+      "Has Previous Purchase",
+      "Visited Offer Page",
+      "Incoming Call Last 24h",
+      "Sessions Last 7d",
+      "Offer Views Last 7d",
+      "Price Comparisons Last 7d",
+      "Days Since Last Visit",
+      "Expected Margin",
+      "Created Hour",
+      "Created Day Of Week"
+    ]
+  },
+  "model_features": [
+    "Minutes Since Abandonment",
+    "Days To Policy Expiry",
+    "Price",
+    "Discount Percent",
+    "Has Previous Purchase",
+    "Visited Offer Page",
+    "Incoming Call Last 24h",
+    "Sessions Last 7d",
+    "Offer Views Last 7d",
+    "Price Comparisons Last 7d",
+    "Days Since Last Visit",
+    "Expected Margin",
+    "Created Hour",
+    "Created Day Of Week",
+    "Product Type",
+    "Channel",
+    "Device",
+    "Partner",
+    "City",
+    "Insurance Company",
+    "Payment Type"
+  ],
+  "model_version": "v1-1b051cb8-78be2c98",
+  "monitoring_baseline": {
+    "categorical": {
+      "Channel": {
+        "frequencies": {
+          "CRM": 0.12171776336466757,
+          "Paid": 0.31940912597502785,
+          "Referral": 0.17466213320380583,
+          "SEO": 0.38421097745649874
+        },
+        "missing_rate": 0.0
+      },
+      "City": {
+        "frequencies": {
+          "Ahvaz": 0.04031543758393097,
+          "Isfahan": 0.07725935026715049,
+          "Karaj": 0.057915940455441586,
+          "Mashhad": 0.09640275436441041,
+          "Other": 0.19774850710020286,
+          "Qom": 0.04051544329837995,
+          "Rasht": 0.04154404411554616,
+          "Shiraz": 0.0687733935255293,
+          "Tabriz": 0.05917311923197806,
+          "Tehran": 0.30143718391954055,
+          "__MISSING__": 0.018914826137889654
+        },
+        "missing_rate": 0.018914826137889654
+      },
+      "Device": {
+        "frequencies": {
+          "desktop": 0.26889339695419867,
+          "mobile": 0.7311066030458013
+        },
+        "missing_rate": 0.0
+      },
+      "Insurance Company": {
+        "frequencies": {
+          "Alborz": 0.08808823109231692,
+          "Asia": 0.18917683362381782,
+          "Dana": 0.13114660418869112,
+          "Iran": 0.2040915454727278,
+          "Parsian": 0.12157490214006114,
+          "Pasargad": 0.09803137232492357,
+          "Saman": 0.16789051115746165
+        },
+        "missing_rate": 0.0
+      },
+      "Partner": {
+        "frequencies": {
+          "autoabzar": 0.12020343438383954,
+          "direct": 0.6669047687076773,
+          "other_partner": 0.11720334866710477,
+          "shoraka": 0.09568844824137833
+        },
+        "missing_rate": 0.0
+      },
+      "Payment Type": {
+        "frequencies": {
+          "bnpl": 0.14174690705448728,
+          "cash": 0.5812166061887483,
+          "installment": 0.27703648675676446
+        },
+        "missing_rate": 0.0
+      },
+      "Product Type": {
+        "frequencies": {
+          "carbody": 0.27777936512471785,
+          "thirdparty": 0.7222206348752821
+        },
+        "missing_rate": 0.0
+      }
+    },
+    "numeric": {
+      "Created Day Of Week": {
+        "bin_counts": [
+          5049,
+          4986,
+          4996,
+          4928,
+          5067,
+          9973
+        ],
+        "bin_edges": [
+          0.0,
+          1.0,
+          2.0,
+          3.0,
+          4.0,
+          5.0,
+          6.0
+        ],
+        "max": 6.0,
+        "min": 0.0,
+        "missing_rate": 0.0
+      },
+      "Created Hour": {
+        "bin_counts": [
+          2916,
+          3073,
+          4453,
+          2927,
+          2956,
+          4430,
+          2849,
+          4258,
+          2838,
+          4299
+        ],
+        "bin_edges": [
+          0.0,
+          2.0,
+          4.0,
+          7.0,
+          9.0,
+          11.0,
+          14.0,
+          16.0,
+          19.0,
+          21.0,
+          23.0
+        ],
+        "max": 23.0,
+        "min": 0.0,
+        "missing_rate": 0.0
+      },
+      "Days Since Last Visit": {
+        "bin_counts": [
+          3197,
+          3455,
+          3581,
+          3573,
+          3552,
+          3579,
+          3553,
+          3441,
+          3532,
+          3536
+        ],
+        "bin_edges": [
+          0.0,
+          0.7,
+          1.5,
+          2.4,
+          3.5,
+          4.8,
+          6.4,
+          8.5,
+          11.4,
+          16.4,
+          60.0
+        ],
+        "max": 60.0,
+        "min": 0.0,
+        "missing_rate": 0.0
+      },
+      "Days To Policy Expiry": {
+        "bin_counts": [
+          3294,
+          3003,
+          3417,
+          4104,
+          3353,
+          3382,
+          3294,
+          3636,
+          3484,
+          4032
+        ],
+        "bin_edges": [
+          -20.0,
+          -3.0,
+          2.0,
+          6.0,
+          10.0,
+          13.0,
+          16.0,
+          19.0,
+          23.0,
+          28.0,
+          60.0
+        ],
+        "max": 60.0,
+        "min": -20.0,
+        "missing_rate": 0.0
+      },
+      "Discount Percent": {
+        "bin_counts": [
+          3359,
+          3444,
+          3437,
+          3338,
+          3685,
+          3117,
+          3790,
+          3485,
+          3393,
+          3572
+        ],
+        "bin_edges": [
+          0.0,
+          1.2,
+          2.7,
+          3.8,
+          4.7,
+          5.6,
+          6.4,
+          7.4,
+          8.5,
+          10.0,
+          18.0
+        ],
+        "max": 18.0,
+        "min": 0.0,
+        "missing_rate": 0.010828880825166433
+      },
+      "Expected Margin": {
+        "bin_counts": [
+          3474,
+          3523,
+          3480,
+          3485,
+          3537,
+          3500,
+          3492,
+          3508,
+          3499,
+          3501
+        ],
+        "bin_edges": [
+          35300.0,
+          140400.0,
+          166400.0,
+          186900.0,
+          205900.0,
+          226600.0,
+          252980.0000000003,
+          304200.0,
+          625840.0000000001,
+          831900.0,
+          1560000.0
+        ],
+        "max": 1560000.0,
+        "min": 35300.0,
+        "missing_rate": 0.0
+      },
+      "Has Previous Purchase": {
+        "bin_counts": [
+          34999
+        ],
+        "bin_edges": [
+          0.0,
+          1.0
+        ],
+        "max": 1.0,
+        "min": 0.0,
+        "missing_rate": 0.0
+      },
+      "Incoming Call Last 24h": {
+        "bin_counts": [
+          34999
+        ],
+        "bin_edges": [
+          0.0,
+          1.0
+        ],
+        "max": 1.0,
+        "min": 0.0,
+        "missing_rate": 0.0
+      },
+      "Minutes Since Abandonment": {
+        "bin_counts": [
+          3297,
+          3484,
+          3658,
+          3470,
+          3583,
+          3385,
+          3550,
+          3485,
+          3545,
+          3542
+        ],
+        "bin_edges": [
+          1.0,
+          30.0,
+          44.0,
+          57.0,
+          70.0,
+          84.0,
+          99.0,
+          117.0,
+          141.0,
+          180.0,
+          360.0
+        ],
+        "max": 360.0,
+        "min": 1.0,
+        "missing_rate": 0.0
+      },
+      "Offer Views Last 7d": {
+        "bin_counts": [
+          7574,
+          8427,
+          7267,
+          5530,
+          6201
+        ],
+        "bin_edges": [
+          0.0,
+          1.0,
+          2.0,
+          3.0,
+          4.0,
+          12.0
+        ],
+        "max": 12.0,
+        "min": 0.0,
+        "missing_rate": 0.0
+      },
+      "Price": {
+        "bin_counts": [
+          3433,
+          3420,
+          3443,
+          3440,
+          3433,
+          3434,
+          3434,
+          3442,
+          3433,
+          3437
+        ],
+        "bin_edges": [
+          1470000.0,
+          5300000.0,
+          6310000.0,
+          7060000.0,
+          7740000.0,
+          8480000.0,
+          9340000.0,
+          10760000.0,
+          16268000.00000003,
+          21530000.0,
+          39160000.0
+        ],
+        "max": 39160000.0,
+        "min": 1470000.0,
+        "missing_rate": 0.018571959198834254
+      },
+      "Price Comparisons Last 7d": {
+        "bin_counts": [
+          12814,
+          12064,
+          6518,
+          3603
+        ],
+        "bin_edges": [
+          0.0,
+          1.0,
+          2.0,
+          3.0,
+          8.0
+        ],
+        "max": 8.0,
+        "min": 0.0,
+        "missing_rate": 0.0
+      },
+      "Sessions Last 7d": {
+        "bin_counts": [
+          2948,
+          6928,
+          8142,
+          7037,
+          4811,
+          5133
+        ],
+        "bin_edges": [
+          1.0,
+          2.0,
+          3.0,
+          4.0,
+          5.0,
+          6.0,
+          14.0
+        ],
+        "max": 14.0,
+        "min": 1.0,
+        "missing_rate": 0.0
+      },
+      "Visited Offer Page": {
+        "bin_counts": [
+          34999
+        ],
+        "bin_edges": [
+          0.0,
+          1.0
+        ],
+        "max": 1.0,
+        "min": 0.0,
+        "missing_rate": 0.0
+      }
+    },
+    "prediction_bin_counts": [
+      3500,
+      3500,
+      3500,
+      3500,
+      3499,
+      3500,
+      3500,
+      3500,
+      3500,
+      3500
+    ],
+    "prediction_bin_edges": [
+      0.003662283377447714,
+      0.02176453855991085,
+      0.033155297858546276,
+      0.04785793996322414,
+      0.06347015680000563,
+      0.07917423072584863,
+      0.09693322339769922,
+      0.11758487994949107,
+      0.14630933591998926,
+      0.19312205584751074,
+      0.5792716708788378
+    ],
+    "rows": 34999
+  },
+  "operating_policy": {
+    "capacity_fraction": 0.1,
+    "definition": "call exactly the top capacity fraction ranked by probability; Lead ID breaks ties",
+    "validation_probability_threshold": 0.193485161243628
+  },
+  "questionable_feature_sensitivity": {
+    "conservative_logistic_validation_metrics": {
+      "average_precision": 0.1784566511037085,
+      "brier_score": 0.07825464727423502,
+      "log_loss": 0.28062508178211915,
+      "roc_auc": 0.7073980095306739
+    },
+    "excluded_features": [
+      "Discount Percent",
+      "Expected Margin",
+      "Incoming Call Last 24h",
+      "Insurance Company",
+      "Payment Type",
+      "Price"
+    ],
+    "full_logistic_validation_metrics": {
+      "average_precision": 0.19344420009371727,
+      "brier_score": 0.07769539924134326,
+      "log_loss": 0.2780516757083156,
+      "roc_auc": 0.715852548424987
+    }
+  },
+  "random_seed": 42,
+  "selected_model": "logistic_regression",
+  "selection_metric": "validation average precision (PR-AUC)",
+  "selection_reason": "Interpretable model was within 0.01 AP and log-loss of the leader.",
+  "source_hash": "1b051cb8d7f09a1ee56862865afeab039db5f8ab57955257b590e6a7e5eb03cf",
+  "split_summary": {
+    "lead_id_overlap": 0,
+    "strategy": "chronological_70_15_15",
+    "test": {
+      "created_max": "2026-08-28T23:58:00+00:00",
+      "created_min": "2026-08-06T10:03:00+00:00",
+      "positives": 558,
+      "prevalence": 0.07439008132249034,
+      "rows": 7501
+    },
+    "train": {
+      "created_max": "2026-07-15T09:06:00+00:00",
+      "created_min": "2026-04-01T00:19:00+00:00",
+      "positives": 3352,
+      "prevalence": 0.09577416497614218,
+      "rows": 34999
+    },
+    "train_cutoff": "2026-07-15T09:07:00+00:00",
+    "validation": {
+      "created_max": "2026-08-06T10:02:00+00:00",
+      "created_min": "2026-07-15T09:07:00+00:00",
+      "positives": 674,
+      "prevalence": 0.08986666666666666,
+      "rows": 7500
+    },
+    "validation_cutoff": "2026-08-06T10:03:00+00:00"
+  },
+  "target": "Completed Purchase",
+  "test_metrics": {
+    "average_precision": 0.1530551701243054,
+    "brier_score": 0.06736416097276657,
+    "capacity": {
+      "top_10pct": {
+        "fraction": 0.1,
+        "k": 751,
+        "lift_at_k": 2.362756468078404,
+        "precision_at_k": 0.17576564580559254,
+        "recall_at_k": 0.23655913978494625
+      },
+      "top_1pct": {
+        "fraction": 0.01,
+        "k": 76,
+        "lift_at_k": 3.1837860780984717,
+        "precision_at_k": 0.23684210526315788,
+        "recall_at_k": 0.03225806451612903
+      },
+      "top_20pct": {
+        "fraction": 0.2,
+        "k": 1501,
+        "lift_at_k": 1.8448943237363857,
+        "precision_at_k": 0.13724183877415055,
+        "recall_at_k": 0.36917562724014336
+      },
+      "top_5pct": {
+        "fraction": 0.05,
+        "k": 376,
+        "lift_at_k": 2.9316422634027304,
+        "precision_at_k": 0.21808510638297873,
+        "recall_at_k": 0.14695340501792115
+      }
+    },
+    "confusion_matrix": [
+      [
+        6333,
+        610
+      ],
+      [
+        426,
+        132
+      ]
+    ],
+    "f1": 0.20307692307692307,
+    "log_loss": 0.2511627667092677,
+    "operating_threshold": 0.193485161243628,
+    "precision": 0.1778975741239892,
+    "prevalence": 0.07439008132249034,
+    "recall": 0.23655913978494625,
+    "roc_auc": 0.6937876626725457,
+    "rows": 7501,
+    "segments": {
+      "Channel": [
+        {
+          "average_precision": 0.20767400711904738,
+          "brier_score": 0.08905404030205873,
+          "prevalence": 0.10279329608938548,
+          "roc_auc": 0.6794899561427257,
+          "rows": 895,
+          "segment": "CRM"
+        },
+        {
+          "average_precision": 0.1423918730193196,
+          "brier_score": 0.06091831384613176,
+          "prevalence": 0.06642066420664207,
+          "roc_auc": 0.6807636211823008,
+          "rows": 2439,
+          "segment": "Paid"
+        },
+        {
+          "average_precision": 0.15221586686583044,
+          "brier_score": 0.05952610534245012,
+          "prevalence": 0.0651685393258427,
+          "roc_auc": 0.71817897141173,
+          "rows": 1335,
+          "segment": "Referral"
+        },
+        {
+          "average_precision": 0.15118107544441847,
+          "brier_score": 0.06975568053795667,
+          "prevalence": 0.07662429378531073,
+          "roc_auc": 0.689684644597369,
+          "rows": 2832,
+          "segment": "SEO"
+        }
+      ],
+      "Product Type": [
+        {
+          "average_precision": 0.15048232272708104,
+          "brier_score": 0.05798758307253726,
+          "prevalence": 0.06372549019607843,
+          "roc_auc": 0.706246476037052,
+          "rows": 2040,
+          "segment": "carbody"
+        },
+        {
+          "average_precision": 0.1550829075242661,
+          "brier_score": 0.07086685625137265,
+          "prevalence": 0.07837392418970884,
+          "roc_auc": 0.6877111066958078,
+          "rows": 5461,
+          "segment": "thirdparty"
+        }
+      ]
+    },
+    "uncertainty": {
+      "average_precision_95pct": [
+        0.13607737756214652,
+        0.1762009393577874
+      ],
+      "roc_auc_95pct": [
+        0.6755893539671872,
+        0.7160646415661096
+      ]
+    }
+  },
+  "trained_at": "2026-09-04T15:59:23.264069+00:00"
+}

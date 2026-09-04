@@ -1,0 +1,20 @@
+{
+  "dummy_prior": {
+    "average_precision": 0.08986666666666666,
+    "brier_score": 0.08182554742516535,
+    "log_loss": 0.30243454318890506,
+    "roc_auc": 0.5
+  },
+  "hist_gradient_boosting": {
+    "average_precision": 0.1819770424776541,
+    "brier_score": 0.07824044150623596,
+    "log_loss": 0.280816134536418,
+    "roc_auc": 0.7054863538869101
+  },
+  "logistic_regression": {
+    "average_precision": 0.19344420009371727,
+    "brier_score": 0.07769539924134326,
+    "log_loss": 0.2780516757083156,
+    "roc_auc": 0.715852548424987
+  }
+}
