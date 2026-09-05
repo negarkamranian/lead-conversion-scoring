@@ -9,6 +9,7 @@ description = "PostgreSQL-backed lead prioritization take-home solution"
 requires-python = ">=3.12,<3.13"
 dependencies = [
   "anyio==4.14.0",
+  "catboost==1.2.8",
   "joblib==1.4.2",
   "matplotlib==3.10.0",
   "mlflow==3.15.2",
@@ -19,6 +20,7 @@ dependencies = [
   "psycopg[binary]==3.2.4",
   "scikit-learn==1.6.1",
   "scipy==1.15.1",
+  "xgboost-cpu==3.0.2",
 ]
 
 [dependency-groups]
@@ -48,6 +50,7 @@ select = ["E", "F", "I", "B", "UP"]
 
 [tool.mypy]
 python_version = "3.12"
+mypy_path = "src"
 packages = ["lead_scoring"]
 disallow_untyped_defs = true
 no_implicit_optional = true
@@ -57,5 +60,5 @@ warn_unused_configs = true
 
 [[tool.mypy.overrides]]
 # These runtime dependencies do not publish PEP 561 typing metadata.
-module = ["joblib", "sklearn.*"]
+module = ["catboost.*", "joblib", "sklearn.*"]
 ignore_missing_imports = true

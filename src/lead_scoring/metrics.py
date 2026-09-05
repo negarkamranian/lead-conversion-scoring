@@ -1,9 +1,8 @@
 import math
-from typing import Any
 
 import numpy as np
 import numpy.typing as npt
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel
 from sklearn.metrics import (
     average_precision_score,
     brier_score_loss,
@@ -18,25 +17,7 @@ from sklearn.metrics import (
 CAPACITY_LEVELS = (0.01, 0.05, 0.10, 0.20)
 
 
-class MetricModel(BaseModel):
-    """Pydantic metric model with the mapping access used by workflows."""
-
-    model_config = ConfigDict(extra="allow", validate_assignment=True)
-
-    def __getitem__(self, key: str) -> Any:
-        try:
-            return getattr(self, key)
-        except AttributeError as error:
-            raise KeyError(key) from error
-
-    def __setitem__(self, key: str, value: Any) -> None:
-        setattr(self, key, value)
-
-    def __contains__(self, key: object) -> bool:
-        return isinstance(key, str) and key in self.model_dump()
-
-
-class TopKMetrics(MetricModel):
+class TopKMetrics(BaseModel):
     """Performance when only the highest-scoring fraction is selected."""
 
     fraction: float
@@ -46,13 +27,19 @@ class TopKMetrics(MetricModel):
     lift_at_k: float
 
 
-class ProbabilityMetrics(MetricModel):
+class ProbabilityMetrics(BaseModel):
     """Threshold-independent probability-quality metrics."""
 
     average_precision: float
     roc_auc: float
     log_loss: float
     brier_score: float
+
+
+class ValidationMetrics(ProbabilityMetrics):
+    precision_at_k: float
+    recall_at_k: float
+    lift_at_k: float
 
 
 class ClassificationMetrics(ProbabilityMetrics):
@@ -68,11 +55,15 @@ class ClassificationMetrics(ProbabilityMetrics):
     capacity: dict[str, TopKMetrics]
 
 
-class BootstrapInterval(MetricModel):
+class BootstrapInterval(BaseModel):
     """Percentile bootstrap confidence intervals for ranking metrics."""
 
     average_precision_95pct: list[float]
     roc_auc_95pct: list[float]
+
+
+class EvaluationMetrics(ClassificationMetrics):
+    uncertainty: BootstrapInterval
 
 
 def validate_metric_inputs(
@@ -96,22 +87,13 @@ def validate_metric_inputs(
     return y_array.astype(int), scores_array.astype(float)
 
 
-def capacity_count(rows: int, fraction: float) -> int:
-    """Return the number of rows selected by a fractional capacity policy."""
-    if rows < 0:
-        raise ValueError("rows must not be negative")
-    if not 0 < fraction <= 1:
-        raise ValueError("fraction must be in the interval (0, 1]")
-    return min(rows, max(1, math.ceil(rows * fraction))) if rows else 0
-
-
 def top_k_metrics(
     y: npt.ArrayLike,
     scores: npt.ArrayLike,
     fraction: float,
 ) -> TopKMetrics:
     y, scores = validate_metric_inputs(y, scores)
-    k = capacity_count(len(y), fraction)
+    k = math.ceil(len(y) * fraction)
 
     order = np.argsort(-scores)
     chosen = y[order[:k]]

@@ -21,10 +21,12 @@ from lead_scoring.config import Settings
 from lead_scoring.data.preparation import prepare_data, select_features
 from lead_scoring.data.splitting import chronological_split, split_summary
 from lead_scoring.metrics import (
-    ClassificationMetrics,
+    EvaluationMetrics,
+    ValidationMetrics,
     bootstrap_interval,
     classification_metrics,
     probability_metrics,
+    top_k_metrics,
 )
 from lead_scoring.modeling import candidates, linear_preprocessor
 from lead_scoring.monitoring import build_monitoring_baseline
@@ -34,6 +36,7 @@ from lead_scoring.schema import (
     NUMERIC_FEATURES,
     TARGET,
 )
+from lead_scoring.serialization import read_json, write_json
 
 logger = logging.getLogger(__name__)
 
@@ -47,16 +50,16 @@ QUESTIONABLE_FEATURES = {
 }
 
 
-def select_model(results: dict[str, dict[str, float]]) -> str:
+def select_model(results: dict[str, ValidationMetrics]) -> str:
     non_dummy = {name: metrics for name, metrics in results.items() if name != "dummy_prior"}
-    best = max(non_dummy, key=lambda name: non_dummy[name]["average_precision"])
+    best = max(non_dummy, key=lambda name: non_dummy[name].average_precision)
 
     logistic = non_dummy["logistic_regression"]
     leader = non_dummy[best]
 
     if (
-        leader["average_precision"] - logistic["average_precision"] <= 0.01
-        and logistic["log_loss"] - leader["log_loss"] <= 0.01
+        leader.average_precision - logistic.average_precision <= 0.01
+        and logistic.log_loss - leader.log_loss <= 0.01
     ):
         return "logistic_regression"
 
@@ -73,7 +76,7 @@ def train(raw: pd.DataFrame, source_hash: str, settings: Settings) -> dict[str, 
     y_validation = splits.validation[TARGET].to_numpy()
 
     fitted = {}
-    comparison = {}
+    comparison: dict[str, ValidationMetrics] = {}
     predictions = {}
     run_ids = {}
 
@@ -86,20 +89,29 @@ def train(raw: pd.DataFrame, source_hash: str, settings: Settings) -> dict[str, 
         with mlflow.start_run(run_name=candidate.name) as run:
             candidate.pipeline.fit(x_train, y_train)
             probabilities = candidate.pipeline.predict_proba(x_validation)[:, 1]
-            validation = probability_metrics(y_validation, probabilities).model_dump(mode="json")
+            capacity = top_k_metrics(y_validation, probabilities, settings.top_fraction)
+            validation = ValidationMetrics(
+                **probability_metrics(y_validation, probabilities).model_dump(),
+                precision_at_k=capacity.precision_at_k,
+                recall_at_k=capacity.recall_at_k,
+                lift_at_k=capacity.lift_at_k,
+            )
 
             estimator = candidate.pipeline.named_steps["model"]
             mlflow.log_params(
                 {
                     "model_name": candidate.name,
                     "random_seed": settings.random_seed,
+                    "capacity_fraction": settings.top_fraction,
                     **{
                         f"model.{name}": value
                         for name, value in estimator.get_params(deep=False).items()
                     },
                 }
             )
-            mlflow.log_metrics({f"validation_{name}": value for name, value in validation.items()})
+            mlflow.log_metrics(
+                {f"validation_{name}": value for name, value in validation.model_dump().items()}
+            )
             mlflow.set_tag("data_hash", source_hash)
             mlflow.sklearn.log_model(
                 candidate.pipeline,
@@ -159,10 +171,10 @@ def train(raw: pd.DataFrame, source_hash: str, settings: Settings) -> dict[str, 
 
     version = f"v1-{source_hash[:8]}-{config_hash[:8]}"
     summary = split_summary(splits)
-    summary_payload = summary.model_dump(mode="json")
     training_probabilities = selected.predict_proba(x_train)[:, 1]
     monitoring_baseline = build_monitoring_baseline(splits.train, training_probabilities)
 
+    comparison_payload = {name: metrics.model_dump() for name, metrics in comparison.items()}
     metadata = {
         "model_version": version,
         "trained_at": datetime.now(UTC).isoformat(),
@@ -170,16 +182,16 @@ def train(raw: pd.DataFrame, source_hash: str, settings: Settings) -> dict[str, 
         "config_hash": config_hash,
         "selected_model": selected_name,
         "mlflow_run_id": selected_run_id,
-        "candidate_validation_metrics": comparison,
+        "candidate_validation_metrics": comparison_payload,
         "questionable_feature_sensitivity": {
             "excluded_features": sorted(QUESTIONABLE_FEATURES),
             "conservative_logistic_validation_metrics": probability_metrics(
                 y_validation, conservative_predictions
             ).model_dump(mode="json"),
-            "full_logistic_validation_metrics": comparison["logistic_regression"],
+            "full_logistic_validation_metrics": comparison_payload["logistic_regression"],
         },
         "operating_threshold": threshold,
-        "split_summary": summary_payload,
+        "split_summary": summary.model_dump(mode="json"),
         "monitoring_baseline": monitoring_baseline.model_dump(mode="json"),
         "test_metrics": None,
     }
@@ -195,14 +207,11 @@ def train(raw: pd.DataFrame, source_hash: str, settings: Settings) -> dict[str, 
 
     save_model_bundle(settings.artifact_dir, bundle)
 
-    with open(settings.artifact_dir / METADATA_PATH, "w") as file:
-        json.dump(metadata, file, indent=2)
+    write_json(settings.artifact_dir / METADATA_PATH, metadata)
 
-    with open(settings.artifact_dir / "split_summary.json", "w") as file:
-        json.dump(summary_payload, file, indent=2)
+    write_json(settings.artifact_dir / "split_summary.json", summary)
 
-    with open(settings.artifact_dir / "validation_model_comparison.json", "w") as file:
-        json.dump(comparison, file, indent=2)
+    write_json(settings.artifact_dir / "validation_model_comparison.json", comparison_payload)
 
     logger.info("Selected %s", selected_name)
 
@@ -213,7 +222,7 @@ def evaluate(
     raw: pd.DataFrame,
     source_hash: str,
     settings: Settings,
-) -> ClassificationMetrics:
+) -> EvaluationMetrics:
     bundle = load_model_bundle(settings.artifact_dir)
 
     if bundle.source_hash != source_hash:
@@ -225,26 +234,21 @@ def evaluate(
     y_test = splits.test[TARGET].to_numpy()
     probabilities = bundle.pipeline.predict_proba(x_test)[:, 1]
 
-    metrics = classification_metrics(
-        y_test,
-        probabilities,
-        bundle.operating_threshold,
-    )
-
-    metrics["uncertainty"] = bootstrap_interval(
-        y_test,
-        probabilities,
-        seed=settings.random_seed,
-        samples=200,
+    metrics = EvaluationMetrics(
+        **classification_metrics(y_test, probabilities, bundle.operating_threshold).model_dump(),
+        uncertainty=bootstrap_interval(
+            y_test,
+            probabilities,
+            seed=settings.random_seed,
+            samples=200,
+        ),
     )
 
     metrics_payload = metrics.model_dump(mode="json")
 
-    with open(settings.artifact_dir / "test_metrics.json", "w") as file:
-        json.dump(metrics_payload, file, indent=2)
+    write_json(settings.artifact_dir / "test_metrics.json", metrics)
 
-    with open(settings.artifact_dir / METADATA_PATH) as file:
-        metadata = json.load(file)
+    metadata = read_json(settings.artifact_dir / METADATA_PATH)
 
     tracked_metrics = {
         f"test_{name}": float(metrics_payload[name])
@@ -270,7 +274,6 @@ def evaluate(
 
     metadata["test_metrics"] = metrics_payload
 
-    with open(settings.artifact_dir / METADATA_PATH, "w") as file:
-        json.dump(metadata, file, indent=2)
+    write_json(settings.artifact_dir / METADATA_PATH, metadata)
 
     return metrics

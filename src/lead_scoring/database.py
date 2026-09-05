@@ -20,10 +20,16 @@ from lead_scoring.schema import CSV_COLUMNS, DB_COLUMNS
 
 LOGGER = logging.getLogger(__name__)
 MAX_CONNECTION_ATTEMPTS = 3
-
-
-class DatabaseConnectionError(RuntimeError):
-    """Raised after transient database connection attempts are exhausted."""
+SCORE_COLUMNS = [
+    "scoring_batch_id",
+    "lead_id",
+    "purchase_probability",
+    "priority_rank",
+    "priority_tier",
+    "scored_at",
+    "model_version",
+    "data_as_of",
+]
 
 
 class ScoringBatch(BaseModel):
@@ -46,7 +52,7 @@ class ScoringBatch(BaseModel):
 
 
 class Database:
-    def __init__(self, settings: Settings):
+    def __init__(self, settings: Settings) -> None:
         self.settings = settings
 
     def _connect_with_retry(self) -> Connection:
@@ -62,11 +68,7 @@ class Database:
                 )
             except psycopg.OperationalError as exc:
                 if attempt == MAX_CONNECTION_ATTEMPTS:
-                    raise DatabaseConnectionError(
-                        f"Could not connect to PostgreSQL at "
-                        f"{self.settings.db_host}:{self.settings.db_port} after "
-                        f"{MAX_CONNECTION_ATTEMPTS} attempts"
-                    ) from exc
+                    raise RuntimeError
                 delay = 0.1 * (2 ** (attempt - 1)) + random.uniform(0, 0.05)
                 LOGGER.warning(
                     "PostgreSQL connection attempt %d/%d failed; retrying in %.2fs",
@@ -105,9 +107,12 @@ class Database:
 
         with self.connect() as conn:
             inserted = conn.execute(
-                "INSERT INTO ingestion_batches(source_hash, source_name, row_count) "
-                "VALUES (%s, %s, %s) ON CONFLICT (source_hash) DO NOTHING "
-                "RETURNING source_hash",
+                """
+                INSERT INTO ingestion_batches(source_hash, source_name, row_count)
+                VALUES (%s, %s, %s)
+                ON CONFLICT (source_hash) DO NOTHING
+                RETURNING source_hash
+                """,
                 (source_hash, csv_path.name, len(raw)),
             ).fetchone()
             if not inserted:
@@ -115,7 +120,7 @@ class Database:
                 self._upsert_dictionary(conn, dictionary_path)
                 return source_hash
             columns = ["source_hash", "source_row_number", *DB_COLUMNS]
-            copy_sql = f"COPY raw_leads ({', '.join(columns)}) FROM STDIN"  # noqa: S608
+            copy_sql = f"COPY raw_leads ({', '.join(columns)}) FROM STDIN"
             with conn.cursor().copy(copy_sql) as copy:
                 for row_number, values in enumerate(raw.itertuples(index=False, name=None), 1):
                     copy.write_row((source_hash, row_number, *values))
@@ -130,17 +135,23 @@ class Database:
         dictionary = pd.read_csv(path, encoding="utf-8-sig", dtype=str)
         with conn.cursor() as cursor:
             cursor.executemany(
-                "INSERT INTO data_dictionary(column_name, description) VALUES (%s, %s) "
-                "ON CONFLICT (column_name) DO UPDATE SET description = EXCLUDED.description, "
-                "loaded_at = NOW()",
+                """
+                INSERT INTO data_dictionary(column_name, description)
+                VALUES (%s, %s)
+                ON CONFLICT (column_name) DO UPDATE
+                SET description = EXCLUDED.description, loaded_at = NOW()
+                """,
                 list(dictionary[["column_name", "description"]].itertuples(index=False, name=None)),
             )
 
     def latest_source_hash(self) -> str:
         with self.connect() as conn:
             row = conn.execute(
-                "SELECT source_hash FROM ingestion_batches "
-                "ORDER BY ingested_at DESC, source_hash DESC LIMIT 1"
+                """
+                SELECT source_hash FROM ingestion_batches
+                ORDER BY ingested_at DESC, source_hash DESC
+                LIMIT 1
+                """
             ).fetchone()
         if not row:
             raise RuntimeError("No ingested data found; run ingest first")
@@ -149,8 +160,12 @@ class Database:
     def load_raw(self, source_hash: str | None = None) -> tuple[pd.DataFrame, str]:
         selected_hash = source_hash or self.latest_source_hash()
         select_columns = ", ".join(DB_COLUMNS)
-        query = f"SELECT {select_columns} FROM raw_leads "  # noqa: S608
-        query += "WHERE source_hash = %s ORDER BY source_row_number"
+        query = f"""
+            SELECT {select_columns}
+            FROM raw_leads
+            WHERE source_hash = %s
+            ORDER BY source_row_number
+        """
         with self.connect() as conn:
             rows = conn.execute(query, (selected_hash,)).fetchall()
         if not rows:
@@ -158,11 +173,13 @@ class Database:
         return pd.DataFrame(rows, columns=CSV_COLUMNS), selected_hash
 
     def write_scores(self, scores: pd.DataFrame, batch: ScoringBatch) -> None:
-        self._validate_scores(scores, batch)
         with self.connect() as conn:
             existing = conn.execute(
-                "SELECT status, row_count, model_version, source_hash FROM scoring_batches "
-                "WHERE scoring_batch_id = %s",
+                """
+                SELECT status, row_count, model_version, source_hash
+                FROM scoring_batches
+                WHERE scoring_batch_id = %s
+                """,
                 (batch.scoring_batch_id,),
             ).fetchone()
             if existing:
@@ -175,9 +192,13 @@ class Database:
                 LOGGER.info("Scoring batch %s already exists; skipping", batch.scoring_batch_id)
                 return
             conn.execute(
-                "INSERT INTO scoring_batches(scoring_batch_id, model_version, source_hash, "
-                "data_as_of, started_at, completed_at, status, row_count) "
-                "VALUES (%s, %s, %s, %s, %s, %s, 'succeeded', %s)",
+                """
+                INSERT INTO scoring_batches(
+                    scoring_batch_id, model_version, source_hash,
+                    data_as_of, started_at, completed_at, status, row_count
+                )
+                VALUES (%s, %s, %s, %s, %s, %s, 'succeeded', %s)
+                """,
                 (
                     batch.scoring_batch_id,
                     batch.model_version,
@@ -188,60 +209,16 @@ class Database:
                     len(scores),
                 ),
             )
-            rows = list(
-                scores[
-                    [
-                        "scoring_batch_id",
-                        "lead_id",
-                        "purchase_probability",
-                        "priority_rank",
-                        "priority_tier",
-                        "scored_at",
-                        "model_version",
-                        "data_as_of",
-                    ]
-                ].itertuples(index=False, name=None)
-            )
+            rows = scores[SCORE_COLUMNS].itertuples(index=False, name=None)
             with conn.cursor() as cursor:
                 cursor.executemany(
-                    "INSERT INTO lead_scores(scoring_batch_id, lead_id, purchase_probability, "
-                    "priority_rank, priority_tier, scored_at, model_version, data_as_of) "
-                    "VALUES (%s, %s, %s, %s, %s, %s, %s, %s)",
+                    f"""
+                    INSERT INTO lead_scores({", ".join(SCORE_COLUMNS)})
+                    VALUES ({", ".join(["%s"] * len(SCORE_COLUMNS))})
+                    """,
                     rows,
                 )
         LOGGER.info("Stored %d scores for batch %s", len(scores), batch.scoring_batch_id)
-
-    @staticmethod
-    def _validate_scores(scores: pd.DataFrame, batch: ScoringBatch) -> None:
-        required = {
-            "scoring_batch_id",
-            "lead_id",
-            "purchase_probability",
-            "priority_rank",
-            "priority_tier",
-            "scored_at",
-            "model_version",
-            "data_as_of",
-        }
-        missing = sorted(required - set(scores.columns))
-        if missing:
-            raise ValueError(f"Score records are missing columns: {missing}")
-        if scores.empty:
-            raise ValueError("Refusing to persist an empty scoring batch")
-        if scores["lead_id"].isna().any() or scores["lead_id"].duplicated().any():
-            raise ValueError("Score records require unique, non-null lead IDs")
-        probabilities = scores["purchase_probability"].to_numpy(dtype=float)
-        if not pd.Series(probabilities).between(0, 1).all():
-            raise ValueError("Score probabilities must be finite values in [0, 1]")
-        ranks = sorted(scores["priority_rank"].astype(int).tolist())
-        if ranks != list(range(1, len(scores) + 1)):
-            raise ValueError("Score priority ranks must be contiguous from 1")
-        if not scores["scoring_batch_id"].astype(str).eq(str(batch.scoring_batch_id)).all():
-            raise ValueError("Score scoring_batch_id values do not match batch lineage")
-        if not scores["model_version"].eq(batch.model_version).all():
-            raise ValueError("Score model_version values do not match batch lineage")
-        if not pd.to_datetime(scores["data_as_of"], utc=True).eq(batch.data_as_of).all():
-            raise ValueError("Score data_as_of values do not match batch lineage")
 
     def load_latest_scores(self) -> pd.DataFrame:
         query = """
@@ -273,12 +250,3 @@ class Database:
             "data_as_of",
         ]
         return pd.DataFrame(rows, columns=columns)
-
-    def score_batch_exists(self, batch_id: UUID) -> bool:
-        with self.connect() as conn:
-            return (
-                conn.execute(
-                    "SELECT 1 FROM scoring_batches WHERE scoring_batch_id = %s", (batch_id,)
-                ).fetchone()
-                is not None
-            )

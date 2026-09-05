@@ -1,36 +1,14 @@
 {
   "average_precision": 0.1530551701243054,
-  "brier_score": 0.06736416097276657,
-  "capacity": {
-    "top_10pct": {
-      "fraction": 0.1,
-      "k": 751,
-      "lift_at_k": 2.362756468078404,
-      "precision_at_k": 0.17576564580559254,
-      "recall_at_k": 0.23655913978494625
-    },
-    "top_1pct": {
-      "fraction": 0.01,
-      "k": 76,
-      "lift_at_k": 3.1837860780984717,
-      "precision_at_k": 0.23684210526315788,
-      "recall_at_k": 0.03225806451612903
-    },
-    "top_20pct": {
-      "fraction": 0.2,
-      "k": 1501,
-      "lift_at_k": 1.8448943237363857,
-      "precision_at_k": 0.13724183877415055,
-      "recall_at_k": 0.36917562724014336
-    },
-    "top_5pct": {
-      "fraction": 0.05,
-      "k": 376,
-      "lift_at_k": 2.9316422634027304,
-      "precision_at_k": 0.21808510638297873,
-      "recall_at_k": 0.14695340501792115
-    }
-  },
+  "roc_auc": 0.6937876626725457,
+  "log_loss": 0.25116276670926524,
+  "brier_score": 0.06736416097276587,
+  "rows": 7501,
+  "prevalence": 0.07439008132249034,
+  "operating_threshold": 0.19348516124362153,
+  "precision": 0.1778975741239892,
+  "recall": 0.23655913978494625,
+  "f1": 0.20307692307692307,
   "confusion_matrix": [
     [
       6333,
@@ -41,76 +19,44 @@
       132
     ]
   ],
-  "f1": 0.20307692307692307,
-  "log_loss": 0.2511627667092677,
-  "operating_threshold": 0.193485161243628,
-  "precision": 0.1778975741239892,
-  "prevalence": 0.07439008132249034,
-  "recall": 0.23655913978494625,
-  "roc_auc": 0.6937876626725457,
-  "rows": 7501,
-  "segments": {
-    "Channel": [
-      {
-        "average_precision": 0.20767400711904738,
-        "brier_score": 0.08905404030205873,
-        "prevalence": 0.10279329608938548,
-        "roc_auc": 0.6794899561427257,
-        "rows": 895,
-        "segment": "CRM"
-      },
-      {
-        "average_precision": 0.1423918730193196,
-        "brier_score": 0.06091831384613176,
-        "prevalence": 0.06642066420664207,
-        "roc_auc": 0.6807636211823008,
-        "rows": 2439,
-        "segment": "Paid"
-      },
-      {
-        "average_precision": 0.15221586686583044,
-        "brier_score": 0.05952610534245012,
-        "prevalence": 0.0651685393258427,
-        "roc_auc": 0.71817897141173,
-        "rows": 1335,
-        "segment": "Referral"
-      },
-      {
-        "average_precision": 0.15118107544441847,
-        "brier_score": 0.06975568053795667,
-        "prevalence": 0.07662429378531073,
-        "roc_auc": 0.689684644597369,
-        "rows": 2832,
-        "segment": "SEO"
-      }
-    ],
-    "Product Type": [
-      {
-        "average_precision": 0.15048232272708104,
-        "brier_score": 0.05798758307253726,
-        "prevalence": 0.06372549019607843,
-        "roc_auc": 0.706246476037052,
-        "rows": 2040,
-        "segment": "carbody"
-      },
-      {
-        "average_precision": 0.1550829075242661,
-        "brier_score": 0.07086685625137265,
-        "prevalence": 0.07837392418970884,
-        "roc_auc": 0.6877111066958078,
-        "rows": 5461,
-        "segment": "thirdparty"
-      }
-    ]
+  "capacity": {
+    "top_1pct": {
+      "fraction": 0.01,
+      "k": 76,
+      "precision_at_k": 0.23684210526315788,
+      "recall_at_k": 0.03225806451612903,
+      "lift_at_k": 3.1837860780984717
+    },
+    "top_5pct": {
+      "fraction": 0.05,
+      "k": 376,
+      "precision_at_k": 0.21808510638297873,
+      "recall_at_k": 0.14695340501792115,
+      "lift_at_k": 2.9316422634027304
+    },
+    "top_10pct": {
+      "fraction": 0.1,
+      "k": 751,
+      "precision_at_k": 0.17576564580559254,
+      "recall_at_k": 0.23655913978494625,
+      "lift_at_k": 2.362756468078404
+    },
+    "top_20pct": {
+      "fraction": 0.2,
+      "k": 1501,
+      "precision_at_k": 0.13724183877415055,
+      "recall_at_k": 0.36917562724014336,
+      "lift_at_k": 1.8448943237363857
+    }
   },
   "uncertainty": {
     "average_precision_95pct": [
-      0.13607737756214652,
-      0.1762009393577874
+      0.13487350074449206,
+      0.17506478958867905
     ],
     "roc_auc_95pct": [
-      0.6755893539671872,
-      0.7160646415661096
+      0.6757223664181228,
+      0.7153828987551324
     ]
   }
 }

@@ -1,6 +1,6 @@
-import json
 import logging
 from datetime import datetime
+from pathlib import Path
 
 import matplotlib.pyplot as plt
 import pandas as pd
@@ -14,6 +14,7 @@ from lead_scoring.schema import (
     TARGET,
     TIME_COLUMN,
 )
+from lead_scoring.serialization import write_json
 
 logger = logging.getLogger(__name__)
 
@@ -35,7 +36,7 @@ class QualityReport(BaseModel):
     outliers: dict[str, int]
 
 
-def outlier_counts(frame):
+def outlier_counts(frame: pd.DataFrame) -> dict[str, int]:
     counts = {}
 
     for column in RAW_NUMERIC:
@@ -48,7 +49,7 @@ def outlier_counts(frame):
     return counts
 
 
-def rare_categories(frame):
+def rare_categories(frame: pd.DataFrame) -> dict[str, list[str]]:
     minimum = max(20, int(len(frame) * 0.001))
 
     return {
@@ -61,7 +62,7 @@ def rare_categories(frame):
     }
 
 
-def build_quality_report(raw) -> tuple[QualityReport, pd.DataFrame]:
+def build_quality_report(raw: pd.DataFrame) -> tuple[QualityReport, pd.DataFrame]:
     frame = prepare_data(raw).frame
 
     report = QualityReport(
@@ -82,7 +83,7 @@ def build_quality_report(raw) -> tuple[QualityReport, pd.DataFrame]:
     return report, frame
 
 
-def generate_eda_charts(frame, chart_dir):
+def generate_eda_charts(frame: pd.DataFrame, chart_dir: Path) -> None:
     monthly = (
         frame.assign(month=frame[TIME_COLUMN].dt.strftime("%Y-%m"))
         .groupby("month")[TARGET]
@@ -133,11 +134,10 @@ def generate_eda_charts(frame, chart_dir):
     plt.close(figure)
 
 
-def run_quality(raw, artifact_dir, chart_dir):
+def run_quality(raw: pd.DataFrame, artifact_dir: Path, chart_dir: Path) -> QualityReport:
     report, frame = build_quality_report(raw)
 
-    with open(artifact_dir / "data_quality_report.json", "w") as file:
-        json.dump(report.model_dump(mode="json"), file)
+    write_json(artifact_dir / "data_quality_report.json", report)
 
     feature_availability_audit().to_csv(
         artifact_dir / "feature_availability_audit.csv",
