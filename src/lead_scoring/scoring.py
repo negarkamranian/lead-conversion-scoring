@@ -1,19 +1,23 @@
 import logging
+import math
 from datetime import UTC, datetime
-from uuid import uuid4
+from uuid import UUID, uuid4
 
+import numpy.typing as npt
 import pandas as pd
 
 from lead_scoring.artifacts import load_model_bundle
+from lead_scoring.config import Settings
 from lead_scoring.data.preparation import prepare_data, select_features
-from lead_scoring.database import ScoringBatch
-from lead_scoring.metrics import capacity_count
+from lead_scoring.database import Database, ScoringBatch
 from lead_scoring.schema import ID_COLUMN, TIME_COLUMN
 
 logger = logging.getLogger(__name__)
 
 
-def rank_leads(lead_ids, probabilities, capacity_fraction):
+def rank_leads(
+    lead_ids: pd.Series, probabilities: npt.ArrayLike, capacity_fraction: float
+) -> pd.DataFrame:
     frame = pd.DataFrame(
         {
             "lead_id": lead_ids.astype(str),
@@ -28,14 +32,20 @@ def rank_leads(lead_ids, probabilities, capacity_fraction):
 
     frame["priority_rank"] = range(1, len(frame) + 1)
 
-    call_capacity = capacity_count(len(frame), capacity_fraction)
+    call_capacity = math.ceil(len(frame) * capacity_fraction)
     frame["priority_tier"] = "backlog"
     frame.loc[: call_capacity - 1, "priority_tier"] = "call"
 
     return frame
 
 
-def score(raw, source_hash, settings, database, batch_id=None):
+def score(
+    raw: pd.DataFrame,
+    source_hash: str,
+    settings: Settings,
+    database: Database,
+    batch_id: UUID | None = None,
+) -> pd.DataFrame:
     bundle = load_model_bundle(settings.artifact_dir)
     prepared = prepare_data(raw, require_target=False)
 

@@ -6,6 +6,7 @@ __pycache__
 .mypy_cache
 artifacts
 charts
+mlruns
 docs
 .env
 *.pyc

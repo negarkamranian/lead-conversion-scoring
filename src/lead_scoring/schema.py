@@ -29,32 +29,7 @@ CSV_COLUMNS = [
     "Completed Purchase",
 ]
 
-SCORING_INPUT_COLUMNS = [column for column in CSV_COLUMNS if column != TARGET]
-
-DB_COLUMNS = [
-    "lead_id",
-    "created_at",
-    "product_type",
-    "channel",
-    "device",
-    "partner",
-    "city",
-    "insurance_company",
-    "payment_type",
-    "minutes_since_abandonment",
-    "days_to_policy_expiry",
-    "price",
-    "discount_percent",
-    "has_previous_purchase",
-    "visited_offer_page",
-    "incoming_call_last_24h",
-    "sessions_last_7d",
-    "offer_views_last_7d",
-    "price_comparisons_last_7d",
-    "days_since_last_visit",
-    "expected_margin",
-    "completed_purchase",
-]
+DB_COLUMNS = [column.lower().replace(" ", "_") for column in CSV_COLUMNS]
 
 NUMERIC_FEATURES = [
     "Minutes Since Abandonment",

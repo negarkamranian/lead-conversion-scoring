@@ -1,20 +1,119 @@
 {
   "dummy_prior": {
     "average_precision": 0.08986666666666666,
-    "brier_score": 0.08182554742516535,
+    "roc_auc": 0.5,
     "log_loss": 0.30243454318890506,
-    "roc_auc": 0.5
-  },
-  "hist_gradient_boosting": {
-    "average_precision": 0.1819770424776541,
-    "brier_score": 0.07824044150623596,
-    "log_loss": 0.280816134536418,
-    "roc_auc": 0.7054863538869101
+    "brier_score": 0.08182554742516535,
+    "precision_at_k": 0.08533333333333333,
+    "recall_at_k": 0.09495548961424333,
+    "lift_at_k": 0.9495548961424333
   },
   "logistic_regression": {
     "average_precision": 0.19344420009371727,
-    "brier_score": 0.07769539924134326,
-    "log_loss": 0.2780516757083156,
-    "roc_auc": 0.715852548424987
+    "roc_auc": 0.715852548424987,
+    "log_loss": 0.2780516757083152,
+    "brier_score": 0.07769539924134318,
+    "precision_at_k": 0.236,
+    "recall_at_k": 0.2626112759643917,
+    "lift_at_k": 2.6261127596439167
+  },
+  "spline_logistic_regression": {
+    "average_precision": 0.19017157044237634,
+    "roc_auc": 0.7135985553578088,
+    "log_loss": 0.2786112880481276,
+    "brier_score": 0.07782359731869459,
+    "precision_at_k": 0.22533333333333333,
+    "recall_at_k": 0.2507418397626113,
+    "lift_at_k": 2.507418397626113
+  },
+  "extra_trees": {
+    "average_precision": 0.1726949898254754,
+    "roc_auc": 0.689847510956971,
+    "log_loss": 0.28436341021286254,
+    "brier_score": 0.07879597748861149,
+    "precision_at_k": 0.212,
+    "recall_at_k": 0.23590504451038577,
+    "lift_at_k": 2.3590504451038576
+  },
+  "random_forest": {
+    "average_precision": 0.17383481871061357,
+    "roc_auc": 0.7003367296103831,
+    "log_loss": 0.2817082534770878,
+    "brier_score": 0.07871472167898859,
+    "precision_at_k": 0.20666666666666667,
+    "recall_at_k": 0.22997032640949555,
+    "lift_at_k": 2.2997032640949557
+  },
+  "gradient_boosting": {
+    "average_precision": 0.18065910339506427,
+    "roc_auc": 0.7074992979365857,
+    "log_loss": 0.2807405833763567,
+    "brier_score": 0.0781425664939911,
+    "precision_at_k": 0.22933333333333333,
+    "recall_at_k": 0.2551928783382789,
+    "lift_at_k": 2.5519287833827895
+  },
+  "hist_gradient_boosting": {
+    "average_precision": 0.18281793024938303,
+    "roc_auc": 0.705369850484402,
+    "log_loss": 0.2808472073336264,
+    "brier_score": 0.0782291381853813,
+    "precision_at_k": 0.22133333333333333,
+    "recall_at_k": 0.24629080118694363,
+    "lift_at_k": 2.462908011869436
+  },
+  "catboost_depth_2": {
+    "average_precision": 0.18814806854995958,
+    "roc_auc": 0.7128417179556957,
+    "log_loss": 0.2791699840178672,
+    "brier_score": 0.07780245688064279,
+    "precision_at_k": 0.23066666666666666,
+    "recall_at_k": 0.25667655786350146,
+    "lift_at_k": 2.5667655786350148
+  },
+  "catboost_depth_4": {
+    "average_precision": 0.19040025471950256,
+    "roc_auc": 0.7135913825736993,
+    "log_loss": 0.2786516037596288,
+    "brier_score": 0.07773264409055182,
+    "precision_at_k": 0.22666666666666666,
+    "recall_at_k": 0.2522255192878338,
+    "lift_at_k": 2.522255192878338
+  },
+  "catboost_depth_6": {
+    "average_precision": 0.18638909457796846,
+    "roc_auc": 0.7116732062171084,
+    "log_loss": 0.27923348306827595,
+    "brier_score": 0.07791090624792958,
+    "precision_at_k": 0.22533333333333333,
+    "recall_at_k": 0.2507418397626113,
+    "lift_at_k": 2.507418397626113
+  },
+  "xgboost_depth_2": {
+    "average_precision": 0.1892613986078251,
+    "roc_auc": 0.7131023291116789,
+    "log_loss": 0.2787363255833736,
+    "brier_score": 0.07779148186112984,
+    "precision_at_k": 0.23333333333333334,
+    "recall_at_k": 0.2596439169139466,
+    "lift_at_k": 2.596439169139466
+  },
+  "xgboost_depth_4": {
+    "average_precision": 0.19004702165402423,
+    "roc_auc": 0.7080493200635378,
+    "log_loss": 0.2798477847683179,
+    "brier_score": 0.07802900495849344,
+    "precision_at_k": 0.22,
+    "recall_at_k": 0.24480712166172106,
+    "lift_at_k": 2.448071216617211
+  },
+  "xgboost_depth_6": {
+    "average_precision": 0.18775224370697174,
+    "roc_auc": 0.7063264390561138,
+    "log_loss": 0.2806325997558854,
+    "brier_score": 0.07828795747049823,
+    "precision_at_k": 0.21466666666666667,
+    "recall_at_k": 0.23887240356083086,
+    "lift_at_k": 2.3887240356083086
   }
 }
