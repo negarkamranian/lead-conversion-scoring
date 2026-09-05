@@ -81,9 +81,7 @@ Only the selected model was evaluated on the later test window (7,501 leads, 558
 
 The top 751 leads contain 132 purchases: **2.36×** the population purchase rate. Test AP is lower, alongside lower purchase prevalence (7.44% versus validation's 8.99%). See [test metrics](artifacts/test_metrics.json) for confidence intervals and [metadata](artifacts/model_metadata.json) for split/feature sensitivity details.
 
-Training/evaluation ran directly from CSV. **29 unit tests and Ruff checks pass.** PostgreSQL integration was not rerun; 16 pre-existing type errors remain in unchanged modules.
-
-This synthetic dataset measures purchase propensity, not incremental sales from calling. Next steps: verified feature timestamps, rolling temporal validation, and a contact/no-contact experiment.
+This synthetic dataset measures purchase propensity, not incremental sales from calling. 
 
 ## View scored leads in PostgreSQL!
 
@@ -117,5 +115,15 @@ To explore the database interactively, run:
 docker compose exec db sh -c 'psql -U "$POSTGRES_USER" -d "$POSTGRES_DB"'
 ```
 
-Useful psql commands are `\dt` to list tables and `\q` to exit. Scoring history is stored in
-`scoring_batches`, while the per-lead results are stored in `lead_scores`.
+Use `\dt` to list tables and `\q` to exit. 
+Scoring history is stored in `scoring_batches`, while the per-lead results are stored in `lead_scores`.
+
+## Future Works
+suggested next steps are:
+
+- **Features:** add cyclic time encoding, log transforms, behavioral ratios, and feature interactions while preventing time leakage.
+- **Models:** compare LightGBM, GAMs, ensembles, and learning-to-rank models using Bayesian tuning and rolling validation.
+- **Imbalance and calibration:** test class weighting or fold-safe resampling, plus Platt or isotonic calibration.
+- **Alternative objectives:** model time to purchase or rank by expected profit using probability, margin, call cost, and capacity.
+- **Causal targeting:** use a contact/no-contact experiment and uplift modeling to find leads whose outcome a call can change.
+- **Analysis and feedback:** add segmentation, SHAP analysis, agent outcomes, drift alerts, and scheduled retraining.
