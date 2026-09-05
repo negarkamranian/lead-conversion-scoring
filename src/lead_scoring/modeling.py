@@ -4,7 +4,11 @@ from dataclasses import dataclass
 
 from sklearn.compose import ColumnTransformer
 from sklearn.dummy import DummyClassifier
-from sklearn.ensemble import HistGradientBoostingClassifier
+from sklearn.ensemble import (
+    GradientBoostingClassifier,
+    HistGradientBoostingClassifier,
+    RandomForestClassifier,
+)
 from sklearn.impute import SimpleImputer
 from sklearn.linear_model import LogisticRegression
 from sklearn.pipeline import Pipeline
@@ -90,6 +94,43 @@ def candidates(seed: int) -> list[Candidate]:
                     (
                         "model",
                         LogisticRegression(C=0.5, max_iter=1000, solver="lbfgs", random_state=seed),
+                    ),
+                ]
+            ),
+        ),
+        Candidate(
+            "random_forest",
+            Pipeline(
+                [
+                    ("preprocess", tree_preprocessor()),
+                    (
+                        "model",
+                        RandomForestClassifier(
+                            n_estimators=300,
+                            min_samples_leaf=20,
+                            max_features=0.8,
+                            n_jobs=-1,
+                            random_state=seed,
+                        ),
+                    ),
+                ]
+            ),
+        ),
+        Candidate(
+            "gradient_boosting",
+            Pipeline(
+                [
+                    ("preprocess", tree_preprocessor()),
+                    (
+                        "model",
+                        GradientBoostingClassifier(
+                            n_estimators=150,
+                            learning_rate=0.04,
+                            max_depth=2,
+                            min_samples_leaf=40,
+                            subsample=0.8,
+                            random_state=seed,
+                        ),
                     ),
                 ]
             ),

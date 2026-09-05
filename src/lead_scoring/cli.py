@@ -9,11 +9,13 @@ from lead_scoring.workflow import COMMAND_NAMES, run_command
 
 logger = logging.getLogger(__name__)
 
-def configure_logging() -> None:
+
+def configure_logging(level: str) -> None:
     logging.basicConfig(
-        level=logging.INFO,
+        level=level,
         format="%(asctime)s %(levelname)s %(name)s %(message)s",
     )
+
 
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="Leakage-aware lead prioritization pipeline")
@@ -21,14 +23,11 @@ def build_parser() -> argparse.ArgumentParser:
     return parser
 
 
-
-
-
-def main():
-    configure_logging()
+def main() -> None:
     args = build_parser().parse_args()
 
     settings = Settings()
+    configure_logging(settings.log_level)
     settings.ensure_output_dirs()
 
     logger.info("Starting %s", args.command)

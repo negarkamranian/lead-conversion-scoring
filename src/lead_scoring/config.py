@@ -23,6 +23,9 @@ class Settings(BaseSettings):
     dictionary_path: FilePath = Path("data/data_dictionary.csv")
     artifact_dir: Path = Path("artifacts")
     chart_dir: Path = Path("charts")
+    mlflow_tracking_uri: NonEmptyString = "sqlite:///mlruns/mlflow.db"
+    mlflow_experiment_name: NonEmptyString = "lead-scoring"
+    log_level: NonEmptyString = "INFO"
 
     random_seed: Seed = 42
     top_fraction: Fraction = 0.1

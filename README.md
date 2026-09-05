@@ -106,9 +106,9 @@ cross-module schemas explicit without adding repository/service interfaces with 
 
 ## Features and preprocessing
 
-Numeric features use training-only median imputation and missingness indicators, with standardization for logistic regression. Categoricals use training-only most-frequent imputation and one-hot encoding with unknown/rare handling for the linear model. The tree candidate uses an unknown-safe ordinal representation. No resampling or class weighting is used: both can alter the meaning of probabilities, while ranking metrics directly address the 9% outcome rate. All transforms live inside a persisted scikit-learn `Pipeline`, preventing train/validation leakage and train/serve skew.
+Numeric features use training-only median imputation and missingness indicators, with standardization for logistic regression. Categoricals use training-only most-frequent imputation and one-hot encoding with unknown/rare handling for the linear model. The tree candidates use an unknown-safe ordinal representation. No resampling or class weighting is used: both can alter the meaning of probabilities, while ranking metrics directly address the 9% outcome rate. All transforms live inside a persisted scikit-learn `Pipeline`, preventing train/validation leakage and train/serve skew.
 
-The comparison is intentionally bounded: prevalence dummy, regularized logistic regression, and one histogram gradient-boosting model with conservative fixed settings and internal early stopping. The primary selection metric is validation average precision (PR-AUC), because telesales cares about concentrating purchases in a small contacted set. A documented simplicity rule selects logistic regression when it is within 0.01 AP and log loss of the leader. Probability quality is considered via log loss, Brier score, and calibration plots; no post-hoc calibration was applied because the logistic model was already reasonably calibrated and calibration would require another clean holdout.
+The comparison is intentionally bounded: prevalence dummy, regularized logistic regression, random forest, gradient boosting, and histogram gradient boosting, all with fixed settings. The primary selection metric is validation average precision (PR-AUC), because telesales cares about concentrating purchases in a small contacted set. A documented simplicity rule selects logistic regression when it is within 0.01 AP and log loss of the leader. Probability quality is considered via log loss and Brier score; no post-hoc calibration was applied because the logistic model was already reasonably calibrated and calibration would require another clean holdout.
 
 A conservative sensitivity run removes all timing-questionable fields (`Insurance Company`, `Payment Type`, `Price`, `Discount Percent`, `Incoming Call Last 24h`, and `Expected Margin`). Its validation AP is 0.1785 versus 0.1934 for the full logistic model (log loss 0.2806 versus 0.2781). The modest, distributed improvement does not look like a single direct leak, but production use remains conditional on confirming those fields' point-in-time lineage. The exact comparison is persisted in model metadata.
 
@@ -116,7 +116,20 @@ A conservative sensitivity run removes all timing-questionable fields (`Insuranc
 
 Rows are ordered by `Created At` and assigned 70%/15%/15% to train, validation, and final test using timestamp boundaries (equal timestamps cannot cross a boundary). Duplicate business keys are removed first, and split reports explicitly verify zero Lead-ID overlap. The validation set selects the model and the probability cutoff corresponding to 10% calling capacity. The final test is accessed only by `evaluate`, after those choices are frozen.
 
-Metrics include prevalence, average precision, ROC-AUC, log loss, Brier score, precision/recall/F1 and confusion matrix at the validation capacity cutoff, top-1/5/10/20% precision, recall, and lift, Product Type/Channel segments, and 200 deterministic bootstrap samples for AP/ROC-AUC uncertainty. Charts include PR, ROC, calibration, gains, score distributions, confusion matrix, and three focused EDA views.
+Metrics include prevalence, average precision, ROC-AUC, log loss, Brier score, precision/recall/F1 and confusion matrix at the validation capacity cutoff, top-1/5/10/20% precision, recall, and lift, plus 200 deterministic bootstrap samples for AP/ROC-AUC uncertainty. Data-quality reporting includes three focused EDA views.
+
+## Experiment tracking
+
+MLflow stores one run for each candidate model. Every run contains the estimator parameters,
+training-data hash, validation metrics, and fitted scikit-learn pipeline. The selected run is recorded
+in `model_metadata.json`; final test metrics are added to that run by `evaluate`. Start the local
+comparison UI after training with:
+
+```bash
+make mlflow-ui
+```
+
+Then open <http://localhost:5000>. MLflow state is persisted in the `mlflow_data` Docker volume.
 
 ## Prioritization and PostgreSQL
 

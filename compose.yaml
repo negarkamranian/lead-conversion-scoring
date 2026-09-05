@@ -28,14 +28,18 @@ services:
       DICTIONARY_PATH: /app/data/data_dictionary.csv
       ARTIFACT_DIR: /app/artifacts
       CHART_DIR: /app/charts
+      MLFLOW_TRACKING_URI: sqlite:////app/mlruns/mlflow.db
+      MLFLOW_EXPERIMENT_NAME: lead-scoring
     depends_on:
       db:
         condition: service_healthy
     volumes:
       - artifacts_data:/app/artifacts
       - charts_data:/app/charts
+      - mlflow_data:/app/mlruns
 
 volumes:
   postgres_data:
   artifacts_data:
   charts_data:
+  mlflow_data:
